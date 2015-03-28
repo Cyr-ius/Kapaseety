@@ -20,10 +20,13 @@ Install :
 	
 	#SQL Password $SQLPwd
 	
-	and schedule job , the syntax is  "powershell.exe -File [path]\kapaseety.ps1"
+	and schedule job once day or any time for a day , the syntax is  "powershell.exe -File [path]\kapaseety.ps1"
 	
 	This task  can run with a read-only permission user for Vcenter
 	
 	
 	
 [Demonstration](http://kapaseety.ipocus.net)
+
+Tested with 100 Esxi  +  2000 virtual machines.
+Task duration : ~ 3 min.
