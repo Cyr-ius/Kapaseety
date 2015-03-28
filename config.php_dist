@@ -1,0 +1,13 @@
+<?php
+
+$config = new stdClass();
+
+// Settings MySQL Dtabase - Replace TAG with yours personnals settings
+$config->sgbd_server = 'SERVER';
+$config->sgbd_user = 'USER';
+$config->sgbd_password = 'PASSWORD';
+$config->sgbd_database = 'DATABASE_NAME';
+
+// Local timezone. Default one is "Europe/Paris".
+$config->timezone = "Europe/Paris";
+?>

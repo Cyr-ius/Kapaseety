@@ -1,0 +1,365 @@
+# Find the VI Server from the global settings file
+# Please donwload and install MySQL Connector .NET http://dev.mysql.com/downloads/file.php?id=450594
+# You can change the following defaults by altering the below settings:
+
+# Start of Settings
+#VMWare Serveur
+$VIServer = ""
+#SQL Serveur
+$SQLServer = ""
+#SQL Database
+$SQLDb = ""
+#SQL User
+$SQLUser=""
+#SQL Password
+$SQLPwd=""
+# Max CPU usage for non HA cluster
+$limitResourceCPUClusNonHA = 0.8
+# Max MEM usage for non HA cluster
+$limitResourceMEMClusNonHA = 0.8
+# End of Settings
+
+
+# Adding PowerCLI core snapin
+if (!(get-pssnapin -name VMware.VimAutomation.Core -erroraction silentlycontinue)) {
+	add-pssnapin VMware.VimAutomation.Core
+}
+
+Function Get-CollectDataCluster
+{
+ [cmdletbinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
+ param(
+    [parameter(Mandatory = $true, ValueFromPipeline = $true)] $cluv
+    )
+    process {
+    	$cluvmlist = $VM | where { $cluv.Host -contains $_.Host.Id  }
+        $storage = $storageviews | where {$cluv.Datastore.value -eq $_.Moref.value}
+        $FailoverLevelCpu=0
+        $FailoverLevelMem=0
+        $DasRealCpuCapacity=0
+        $DasRealMemCapacity=0
+
+		$clucapacity = "" |Select "cluster_moref","clustername","cluster_hosts_total","cluster_vms_total","cluster_failover_cpu","cluster_cpu_total","cluster_cpu_realcapacity","cluster_cpu_usage","cluster_failover_mem","cluster_mem_usage","cluster_mem_realcapacity","cluster_mem_total","cluster_vmcpu_average","cluster_vmmem_average", "cluster_vmcpu_left", "cluster_vmmem_left", "cluster_vcpu_ratio", "cluster_vmhost_ratio","cluster_datastore_total","cluster_datastore_free","cluster_datastore_used","cluster_date"
+
+		if ( $cluv.Configuration.DasConfig.Enabled -eq $true ) {
+			if ($cluv.Configuration.DasConfig.AdmissionControlPolicy.FailoverLevel) {
+				$FailoverLevelCpu = $cluv.Configuration.DasConfig.AdmissionControlPolicy.FailoverLevel
+			} 
+			elseif ($cluv.Configuration.DasConfig.AdmissionControlPolicy.CpuFailoverResourcesPercent) {
+				$FailoverLevelCpu = $cluv.Summary.NumHosts - (($cluv.Configuration.DasConfig.AdmissionControlPolicy.CpuFailoverResourcesPercent * $cluv.Summary.NumHosts)/100)
+			}
+			$DasRealCpuCapacity = $cluv.Summary.EffectiveCpu - (($cluv.Summary.EffectiveCpu * $FailoverLevelCpu)/$cluv.Summary.NumHosts)
+			
+			if ($cluv.Configuration.DasConfig.AdmissionControlPolicy.FailoverLevel) {
+				$FailoverLevelMem = $cluv.Configuration.DasConfig.AdmissionControlPolicy.FailoverLevel
+			} 
+			elseif ($cluv.Configuration.DasConfig.AdmissionControlPolicy.MemoryFailoverResourcesPercent) {
+				$FailoverLevelMem = $cluv.Summary.NumHosts - (($cluv.Configuration.DasConfig.AdmissionControlPolicy.MemoryFailoverResourcesPercent * $cluv.Summary.NumHosts)/100)
+			}						
+			$DasRealMemCapacity = $cluv.Summary.EffectiveMemory - (($cluv.Summary.EffectiveMemory * $FailoverLevelMem)/$cluv.Summary.NumHosts)
+		} else {
+			$DasRealCpuCapacity = $cluv.Summary.EffectiveCpu * $limitResourceCPUClusNonHA
+			$DasRealMemCapacity = $cluv.Summary.EffectiveMemory * $limitResourceMEMClusNonHA
+		}
+		
+        $clucapacity.cluster_moref = $cluv.moref.value
+		$clucapacity.clustername = $cluv.name
+		$clucapacity.cluster_hosts_total =  $cluv.Summary.NumHosts
+		$clucapacity.cluster_vms_total =  $cluvmlist.count
+		$clucapacity.cluster_failover_cpu =  $FailoverLevelCpu
+		$clucapacity.cluster_cpu_total =  $cluv.Summary.EffectiveCpu
+		$clucapacity.cluster_cpu_realcapacity =  [math]::round($DasRealCpuCapacity,0)		
+		$clucapacity.cluster_failover_mem =  $FailoverLevelMem
+		$clucapacity.cluster_mem_realcapacity =  [math]::round($DasRealMemCapacity,0)
+		$clucapacity.cluster_mem_total =  $cluv.Summary.EffectiveMemory
+	
+		#CPU
+		
+		#$CluCpuUsage = (get-view $cluv.ResourcePool).Summary.runtime.cpu.OverallUsage
+        $CluCpuUsage =(get-view $cluv.ResourcePool).Summary.Quickstats.OverallCpuUsage
+		$CluCpuUsageAvg = $CluCpuUsage
+		if ($cluvmlist -and $cluv.host -and $CluCpuUsageAvg -gt 0){
+			$VmCpuAverage = $CluCpuUsageAvg/($cluvmlist.count)
+			$CpuVmLeft = [math]::round(($DasRealCpuCapacity-$CluCpuUsageAvg)/$VmCpuAverage,0)
+		}
+		elseif ($CluCpuUsageAvg -eq 0) {$CpuVmLeft = 0}
+		else {$CpuVmLeft = 0}
+		
+		$clucapacity.cluster_cpu_usage = $CluCpuUsage
+		$clucapacity.cluster_vmcpu_average =  [math]::round($VmCpuAverage,0)
+		$clucapacity.cluster_vmcpu_left =  $CpuVmLeft
+
+	
+		#MEM
+		#$CluMemUsage = (get-view $cluv.ResourcePool).Summary.runtime.memory.OverallUsage
+        $CluMemUsage =(get-view $cluv.ResourcePool).Summary.Quickstats.HostMemoryUsage
+		$CluMemUsageAvg = $CluMemUsage
+		if ($cluvmlist -and $cluv.host -and $CluMemUsageAvg -gt 0){
+			$VmMemAverage = $CluMemUsageAvg/$cluvmlist.count
+			$MemVmLeft = [math]::round(($DasRealMemCapacity-$CluMemUsageAvg)/$VmMemAverage,0)
+		}
+		elseif ($CluMemUsageAvg -eq 0) { $MemVmLeft = 0}
+		else {$MemVmLeft = 0}
+		
+		$clucapacity.cluster_mem_usage = [math]::round($CluMemUsage)
+		$clucapacity.cluster_vmmem_average = [math]::round($VmMemAverage,0)
+		$clucapacity.cluster_vmmem_left = $MemVmLeft
+		
+	
+
+		if ($cluvmlist){
+			$vCPUpCPUratio = [math]::round(($cluvmlist|Measure-Object -Sum -Property NumCpu).sum / $cluv.summary.NumCpuThreads,0)
+			$clucapacity.cluster_vcpu_ratio = $vCPUpCPUratio
+		} else {
+			$clucapacity.cluster_vcpu_ratio = "0"
+		}
+		
+		if ($cluvmlist){
+			$VMVMHostratio = [math]::round(($cluvmlist).count/$cluv.Summary.NumHosts,0)
+			$clucapacity.cluster_vmhost_ratio = $VMVMHostratio
+		}
+		else {
+			$clucapacity.cluster_vmhost_ratio = 0
+		}
+		
+		$datastorefree=[math]::round(($storage.Summary | measure-object -prop FreeSpace -sum | select -ExpandProperty Sum)/1GB,0)
+		$clucapacity.cluster_datastore_free = $datastorefree
+
+		$datastoretotal=[math]::round(($storage.Summary | measure-object -prop Capacity -sum | select -ExpandProperty Sum)/1GB,0)
+		$clucapacity.cluster_datastore_total = $datastoretotal
+		$clucapacity.cluster_datastore_used = $datastoretotal - $datastorefree
+        $clucapacity.cluster_date = $date_us
+
+        $SQL ="INSERT INTO data_clusters (cluster_moref,clustername,cluster_hosts_total,cluster_vms_total,cluster_failover_cpu,cluster_cpu_total,cluster_cpu_realcapacity,cluster_cpu_usage,cluster_failover_mem,cluster_mem_usage,cluster_mem_realcapacity,cluster_mem_total,cluster_vmcpu_average,cluster_vmmem_average, cluster_vmcpu_left, cluster_vmmem_left, cluster_vcpu_ratio, cluster_vmhost_ratio,cluster_datastore_total,cluster_datastore_free,cluster_datastore_used,cluster_date)  VALUES ('"`
+            +$clucapacity.cluster_moref+"','"`
+            +$clucapacity.clustername+"','"`
+            +$clucapacity.cluster_hosts_total+"','"`
+            +$clucapacity.cluster_vms_total+"','"`
+            +$clucapacity.cluster_failover_cpu+"','"`
+            +$clucapacity.cluster_cpu_total+"','"`
+            +$clucapacity.cluster_cpu_realcapacity+"','"`
+            +$clucapacity.cluster_cpu_usage+"','"`
+            +$clucapacity.cluster_failover_mem+"','"`
+            +$clucapacity.cluster_mem_usage+"','"`
+            +$clucapacity.cluster_mem_realcapacity+"','"`
+            +$clucapacity.cluster_mem_total+"','"`
+            +$clucapacity.cluster_vmcpu_average+"','"`
+            +$clucapacity.cluster_vmmem_average+"','"`
+            +$clucapacity.cluster_vmcpu_left+"','"`
+            +$clucapacity.cluster_vmmem_left+"','"`
+            +$clucapacity.cluster_vcpu_ratio+"','"`
+            +$clucapacity.cluster_vmhost_ratio+"','"`
+            +$clucapacity.cluster_datastore_total+"','"`
+            +$clucapacity.cluster_datastore_free+"','"`
+            +$clucapacity.cluster_datastore_used+"','"`
+            +$clucapacity.cluster_date+"')"
+
+        Execute-MySQLNonQuery $conn $SQL
+
+
+        return $clucapacity
+}
+}
+
+
+Function Get-CollectDataHost
+{
+ [cmdletbinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
+ param(
+    [parameter(Mandatory = $true, ValueFromPipeline = $true)] $HostView
+    )
+    process {
+        $cluster = $clusviews | where {$_.moref -eq $HostView.parent} 
+        $cluvmlist = $VM | where {$_.vmhost.toString() -eq $HostView.name}
+        $storage = $storageviews | where {$HostView.Datastore.value -eq $_.Moref.value}
+
+        $hostcapacity = "" |Select "moref","hostname","cluster","vm_num","version","manufacturer","model","mem_total","cpu_socket_num","cpu_total","cpu_numcores","cpu_num","datastore_free","datastore_used","datastore_total","cpu_usage", "mem_usage","date"	,"moref_cluster"		
+        $hostcapacity.moref = $HostView.moref.value
+        $hostcapacity.hostname = $HostView.name
+        $hostcapacity.cluster = $cluster.name
+        $hostcapacity.vm_num = $cluvmlist.count
+        $hostcapacity.version = $HostView.Config.Product.Version
+        $hostcapacity.manufacturer = $HostView.hardware.systeminfo.vendor
+        $hostcapacity.model = $HostView.hardware.SystemInfo.Model
+        $hostcapacity.mem_total = [Math]::Round($HostView.Hardware.MemorySize/1MB)
+        $hostcapacity.cpu_socket_num = $HostView.hardware.Cpuinfo.NumCpuCores	
+        $hostcapacity.cpu_total = [Math]::Round(($HostView.Hardware.CpuInfo.NumCpuCores * $HostView.Hardware.CpuInfo.hz)/1000000)
+        $hostcapacity.cpu_numcores = $HostView.summary.hardware.NumCpuCores / $HostView.summary.hardware.NumCpuPkgs
+        $hostcapacity.cpu_num = $HostView.summary.hardware.NumCpuPkgs
+		$datastorefree=[math]::round(($storage.Summary | measure-object -prop FreeSpace -sum | select -ExpandProperty Sum)/1GB,0)
+		$hostcapacity.datastore_free = $datastorefree
+		$datastoretotal=[math]::round(($storage.Summary | measure-object -prop Capacity -sum | select -ExpandProperty Sum)/1GB,0)
+		$hostcapacity.datastore_total = $datastoretotal
+		$hostcapacity.datastore_used = $datastoretotal - $datastorefree
+        $hostcapacity.cpu_usage = $HostView.Summary.QuickStats.OverallCpuUsage
+        $hostcapacity.mem_usage = $HostView.Summary.QuickStats.OverallMemoryUsage
+        $hostcapacity.date = $date_us
+        $hostcapacity.moref_cluster = $HostView.Parent.value
+
+        $SQL ="INSERT INTO data_hosts (moref,hostname,cluster,vm_num,version,manufacturer ,model,mem_total,cpu_socket_num ,cpu_total,cpu_numcores,cpu_num,datastore_free,datastore_total,datastore_used,cpu_usage,mem_usage,date,moref_cluster)  VALUES ('"`
+            +$hostcapacity.moref+"','"`
+            +$hostcapacity.hostname+"','"`
+            +$hostcapacity.cluster+"','"`
+            +$hostcapacity.vm_num+"','"`
+            +$hostcapacity.version+"','"`
+            +$hostcapacity.manufacturer+"','"`
+            +$hostcapacity.model+"','"`
+            +$hostcapacity.mem_total+"','"`
+            +$hostcapacity.cpu_socket_num+"','"`
+            +$hostcapacity.cpu_total+"','"`
+            +$hostcapacity.cpu_numcores+"','"`
+            +$hostcapacity.cpu_num+"','"`
+            +$hostcapacity.datastore_free+"','"`
+            +$hostcapacity.datastore_total+"','"`
+            +$hostcapacity.datastore_used+"','"`
+            +$hostcapacity.cpu_usage+"','"`
+            +$hostcapacity.mem_usage+"','"`
+            +$hostcapacity.date+"','"`
+            +$hostcapacity.moref_cluster+"')"
+
+        Execute-MySQLNonQuery $conn $SQL
+        return $hostcapacity
+}
+}
+
+Function Get-CollectDataVM
+{
+ [cmdletbinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
+ param(
+    [parameter(Mandatory = $true, ValueFromPipeline = $true)] $VMView
+    )
+    process {
+    	$vmcapacity = "" |Select "vm_moref","vmname","moref_host","vm_cpu_total","vm_cpu_usage","vm_cpu_num","vm_mem_total","vm_mem_usage","vm_powerstate","vm_guest_os","vm_date","vm_moref_resourcepool"
+        $vmcapacity.vm_moref = $VMView.moref.value
+        $vmcapacity.vmname = $VMView.name
+        $vmcapacity.moref_host = $VMView.Summary.Runtime.Host.value
+        $vmcapacity.vm_cpu_usage = $VMView.Summary.QuickStats.OverallCpuUsage
+        $vmcapacity.vm_cpu_num = $VMView.Summary.Config.NumCpu
+        $vmcapacity.vm_cpu_total = $VMView.Runtime.MaxCpuUsage
+        $vmcapacity.vm_mem_total = $VMView.Runtime.MaxMemoryUsage
+        $vmcapacity.vm_mem_usage = $VMView.Summary.QuickStats.HostMemoryUsage
+        $vmcapacity.vm_powerstate = $VMView.Runtime.PowerState
+        $vmcapacity.vm_guest_os = $VMView.Guest.GuestFullName
+        $vmcapacity.vm_date = $date_us
+        $vmcapacity.vm_moref_resourcepool = $VMView.ResourcePool.value
+
+        $SQL ="INSERT INTO data_vms (vm_moref,vmname,moref_host,vm_cpu_total,vm_cpu_usage,vm_cpu_num ,vm_mem_total,vm_mem_usage,vm_powerstate ,vm_guest_os,vm_date,vm_moref_resourcepool)  VALUES ('"`
+            +$vmcapacity.vm_moref+"','"`
+            +$vmcapacity.vmname+"','"`
+            +$vmcapacity.moref_host+"','"`
+            +$vmcapacity.vm_cpu_total+"','"`
+            +$vmcapacity.vm_cpu_usage+"','"`
+            +$vmcapacity.vm_cpu_num+"','"`
+            +$vmcapacity.vm_mem_total+"','"`
+            +$vmcapacity.vm_mem_usage+"','"`
+            +$vmcapacity.vm_powerstate+"','"`
+            +$vmcapacity.vm_guest_os+"','"`
+            +$vmcapacity.vm_date+"','"`
+            +$vmcapacity.vm_moref_resourcepool+"')"
+        Execute-MySQLNonQuery $conn $SQL
+
+        return $vmcapacity
+    }
+}
+
+Function Get-CollectDataResPool
+{
+ [cmdletbinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
+ param(
+    [parameter(Mandatory = $true, ValueFromPipeline = $true)] $RespoolView
+    )
+    process {
+
+    	$respool = "" |Select "respool_moref","respool_name","respool_moref_cluster","respool_cpu_reservation","respool_cpu_limit","respool_cpu_expand","respool_cpu_shares","respool_mem_reservation","respool_mem_limit","respool_mem_expand","respool_mem_shares"
+        $respool.respool_moref = $RespoolView.moref.value
+        $respool.respool_name = $RespoolView.name
+        $respool.respool_moref_cluster = $RespoolView.Owner.Value
+        $respool.respool_cpu_reservation = $RespoolView.Config.CpuAllocation.Reservation
+        $respool.respool_cpu_limit = $RespoolView.Config.CpuAllocation.Limit
+        $respool.respool_cpu_expand = $RespoolView.Config.CpuAllocation.ExpandableReservation
+        $respool.respool_cpu_shares = $RespoolView.Config.CpuAllocation.Shares.Shares
+        $respool.respool_mem_reservation = $RespoolView.Config.MemoryAllocation.Reservation
+        $respool.respool_mem_limit = $RespoolView.Config.MemoryAllocation.Limit
+        $respool.respool_mem_expand = $RespoolView.Config.MemoryAllocation.ExpandableReservation
+        $respool.respool_mem_shares = $RespoolView.Config.MemoryAllocation.Shares.Shares
+
+        $SQL ="INSERT INTO data_respools (respool_moref,respool_name,respool_moref_cluster,respool_cpu_reservation,respool_cpu_limit,respool_cpu_expand ,respool_cpu_shares,respool_mem_reservation,respool_mem_limit ,respool_mem_expand,respool_mem_shares)  VALUES ('"`
+            +$respool.respool_moref+"','"`
+            +$respool.respool_name+"','"`
+            +$respool.respool_moref_cluster+"','"`
+            +$respool.respool_cpu_reservation+"','"`
+            +$respool.respool_cpu_limit+"','"`
+            +$respool.respool_cpu_expand+"','"`
+            +$respool.respool_cpu_shares+"','"`
+            +$respool.respool_mem_reservation+"','"`
+            +$respool.respool_mem_limit+"','"`
+            +$respool.respool_mem_expand+"','"`
+            +$respool.respool_mem_shares+"')"
+
+        Execute-MySQLNonQuery $conn $SQL
+
+        return $respool
+    }
+}
+
+
+function Connect-MySQL($user,$pass,$MySQLHost,$database) { 
+  # Load MySQL .NET Connector Objects 
+  [void][system.reflection.Assembly]::LoadWithPartialName("MySql.Data") 
+  # Open Connection 
+  
+  $connStr = "Server=$MySQLHost;uid=$user;pwd=$pass;Database=$database;" 
+  $conn = New-Object MySql.Data.MySqlClient.MySqlConnection($connStr) 
+  $conn.Open() 
+  return $conn 
+} 
+ 
+function Disconnect-MySQL($conn) {
+  $conn.Close()
+}
+
+function Execute-MySQLNonQuery($conn, [string]$query) { 
+  $command = $conn.CreateCommand()                  # Create command object
+  $command.CommandText = $query                     # Load query into object
+  $RowsInserted = $command.ExecuteNonQuery()        # Execute command
+  $command.Dispose()                                # Dispose of command object
+  if ($RowsInserted) { 
+    return $RowInserted 
+  } else { 
+    return $false 
+  } 
+} 
+
+Write-Host "Connect VCenter"
+Connect-VIServer $VIServer
+Write-Host "Collect VM"
+$VM = Get-VM | Sort Name
+Write-Host  "Collect View VM"
+$FullVM = Get-View -ViewType VirtualMachine | Where {-not $_.Config.Template}
+Write-Host  "Collect View Hosts"
+$HostsViews = Get-View -ViewType hostsystem
+Write-Host  "Collect View Clusters"
+$clusviews = Get-View -ViewType ClusterComputeResource
+Write-Host  "Collect View Datastores"
+$storageviews = Get-View -ViewType Datastore
+Write-Host  "Collect Ressource Pools"
+$Respoolviews = get-view -viewType ResourcePool
+
+
+$date_us = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
+Write-Host  "Connect MySQL"
+$conn = Connect-MySQL $SQLUser $SQLPwd $SQLServer $SQLDb
+Write-Host "Purge Ressource Pool Table"
+$SQL = "DELETE FROM data_respools"
+Execute-MySQLNonQuery $conn $SQL
+Write-Host  "Collect Data Cluster"
+$Clusviews | Get-CollectDataCluster
+Write-Host "Collect Data Host"
+$Hostsviews | Get-CollectDataHost
+Write-Host "Collect Data VM"
+$Fullvm | Get-CollectDataVM
+Write-Host "Collect Data Resource Pool"
+$Respoolviews | Get-CollectDataResPool
+Disconnect-MySQL($conn)
+Disconnect-VIServer -Confirm:$false
+Write-Host "Collect Finish"
