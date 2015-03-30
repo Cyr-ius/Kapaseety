@@ -256,7 +256,6 @@ class jsonRPCServer {
 	} 
 	
 	private function ok($result){
-					//print_r($result);
 					$this->response = array (
 						'jsonrpc'	=> '2.0',
 						'id' => (isset($this->request['id'])?$this->request['id']:null),
@@ -269,10 +268,10 @@ class jsonRPCServer {
 	 *
 	 */
 	private function sendResponse(){
+
 		if (!empty($this->request['id'])) { // notifications don't want response
 			header('content-type: application/json');
-			die( json_encode($this->response,JSON_NUMERIC_CHECK) );
-			
+			die( json_encode($this->response,JSON_NUMERIC_CHECK) );			
 		}
 	}
 	

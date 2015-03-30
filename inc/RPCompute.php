@@ -3,12 +3,12 @@ class RPCompute
 {
 
 private $MySQL;
-private $RatioRP;
 private $Cluster_Stat;
 private $UpperLimit = 10000;
 private $moref;
 private $MinPoolCPUshares = 100;
 private $MinPoolMemshares = 100;
+public  $RatioRP = array("gold"=>4,"silver"=>2,"bronze"=>1);
 private $rps;
 
 	function __construct($moref){
@@ -17,9 +17,7 @@ private $rps;
 		$this->moref = $moref;
 		if (Settings::get("rpc_".$moref)) {
 			$this->RatioRP=unserialize(Settings::get("rpc_".$moref)[0]);
-		} else {
-			$this->RatioRP=array("gold"=>4,"silver"=>2,"bronze"=>1);
-		}
+		} 
 	}
 	
 	function compute() {
@@ -103,31 +101,46 @@ private $rps;
 		for ($i=0; $i < count($ResourcePools); $i++)
 			{
 				$line = array();
-				$line['Name'] = $ResourcePools[$i];
-				$line['CPU Share'] = round($PoolCPUShares[$i]);
-				$line['MEM Share'] = round($PoolMemShares[$i]);
+				$line['name'] = $ResourcePools[$i];
+				$line['cpushare'] = round($PoolCPUShares[$i]);
+				$line['memshare'] = round($PoolMemShares[$i]);
 				$rps[] = $line;
 			}
 		
-		$this->rp = $rps;
+		$this->rp = array("data"=>$rps);
 		return $this->rp;
 	}
 	function render(){
-			$style = new Style();
-			$style->Tableau($this->rp,"respools-stats",
-			"
-			<div class='row' style='margin-right:10px'>
-			<div class='col-sm-11'>Recomandations</div>
-			<div class='col-sm-1'>
-			<button class='btn btn-default btn-sm' type='button' data-toggle='collapse' data-target='#collapseExample' aria-expanded='false' aria-controls='collapseExample'>
-			<span class='glyphicon glyphicon-cog'></span></button></div>
-			</div>
-			<div class='collapse' id='collapseExample'>
-			  <div style='position:relative'>
-			    <input id='slider_rp' type='text'/><br/>
+
+		echo "
+		<div class='cold-lg-12'>
+		<div class='panel panel-default panel-stats style='margin: 9px 9px 0px '>
+			<div class='panel-heading'>
+			  <div class='row' style='margin-right:10px'>
+			      <div class='col-sm-11'>Recomandations</div>
+			      <div class='col-sm-1'>
+				<button class='btn btn-default btn-sm' type='button' data-toggle='collapse' data-target='#collapseExample' aria-expanded='false' aria-controls='collapseExample'>
+				<span class='glyphicon glyphicon-cog'></span></button></div>
+			      </div>
+			  <div class='collapse' id='collapseExample'>
+			      <div style='position:relative'>
+			          <input id='slider_rp' type='text'/><br/>
+			      </div>
 			  </div>
 			</div>
-			",true,"table-simple");
+		<table class='table table-striped table-hover table-rp cellspacing='0' width='100%'>\n
+		<thead>\n
+		<tr>\n
+		<th>Name</th>
+		<th>Cpu Share</th>
+		<th>Mem Share</th>
+		</tr>\n
+		</thead>\n
+		</table>
+		</div>
+		</div>
+		";
+
 	}
 }
 ?>

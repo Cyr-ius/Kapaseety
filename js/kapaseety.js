@@ -20,6 +20,8 @@ var graphOptions = {
 	credits: {enabled: false}
 	};
 
+var rpstable;
+
 function init() {
 
 	$('.table-paging').dataTable({jQueryUI:true,searching:false,scrollX: true,scrollCollapse: true,"order": []})
@@ -208,7 +210,7 @@ function getjson(method,params=null,callback){
 	 	err = function (code,msg,fullmsg){
 		if ($.inArray(code,this.o.ignoreErrors) < 0){
 				alert(code + "::" + msg + "::" + fullmsg);
-				console.log(msg);
+				console.log(code + "::" + msg + "::" + fullmsg);
 			}
 	 	}
  		request = {};
@@ -264,11 +266,12 @@ function loadslider_cluster(json){
 	val1 = json.result.bronze;
 	val2 = json.result.silver+json.result.bronze;
 	$("#slider_rp").slider({ id: "slider_rpc", min: 0, max: 7, range: true, value: [val1, val2],tooltip_split:'true' });
+
 	//Change Ressource Pool Slider
 	$('#slider_rp').on('slideStop',function(data){
 	   jsonObj = {"moref":moref,"setting":{"gold":(7 - data.value[1]),"silver":(data.value[1]-data.value[0]),"bronze":data.value[0]}};
 	   getjson("WS_ClusterDetail.set_pool",jsonObj,function(){
-		getjson("WS_ClusterDetail.compute_rp",{"moref":moref},hello);//Todo refresh datable
+			rpstable.DataTable().ajax.reload();
 	   });
 	});
 }
@@ -276,12 +279,7 @@ function loadslider_cluster(json){
 function loadchart_cluster(){
 	
 	moref = $('#moref').html();
-	val1 = 1;
-	val2 = 2;
-	// Initialize Ressource Pool Slider
-	getjson("WS_ClusterDetail.get_pool",{"moref":moref},loadslider_cluster);
 
-	
 	//Graph Left VM			
 	$('#graph-vm-left').highcharts(Highcharts.merge(gaugeOptions,{
 	chart:{shadow:true},
@@ -368,6 +366,18 @@ function loadchart_cluster(){
 	getjson("WS_Stats.cluster_serie",{"moref":moref,"select":"round(cluster_cpu_realcapacity*100/cluster_cpu_total) as cpur,round(cluster_mem_realcapacity*100/cluster_mem_total) as memr"},function(data){
 		$('#graph-consommation').highcharts().series[1].setData(data.result);
 	});
+	
+	// Initialize Ressource Pool Slider
+	rpstable = $('.table-rp').dataTable({
+		jQueryUI:true,searching:false,scrollCollapse: true,paging: false,info:false,"order": [],"serverSide": true,stateSave: true,
+		"columns":[{"data":"name"},{"data":"cpushare"},{"data":"memshare"}],
+		"ajax": function ( request, drawCallback, settings ) {
+				getjson("WS_ClusterDetail.compute_rp",{"moref":moref},function(data){
+					drawCallback(data.result)
+				});
+		}
+	});
+	getjson("WS_ClusterDetail.get_pool",{"moref":moref},loadslider_cluster);
 
 	// Graph Historic Consommation 
         $('#graph-consommation-hist').highcharts(Highcharts.merge(graphOptions,{
@@ -516,15 +526,15 @@ function loadchart_datastore(){
         yAxis: { title: {text: '%'},min:0,max:100},
 	tooltip: {valueSuffix: ' %'},
         plotOptions: {series: {stacking: 'normal'}},
-	series:[{},{}]
+	series:[{"name":"Free"},{"name":"Used"}]
 	}));
 
 	getjson("WS_ClusterDetail.get_clusterlist",null,function(data){
 		$('#graph-datastore_usage').highcharts().xAxis[0].setCategories(data.result);
 	});
 	getjson("WS_DatastoreDetail.get_datastoreusage",null,function(data){
-		$('#graph-datastore_usage').highcharts().series[0].setData(data.result.used);
-		$('#graph-datastore_usage').highcharts().series[1].setData(data.result.free);
+		$('#graph-datastore_usage').highcharts().series[0].setData(data.result.free);
+		$('#graph-datastore_usage').highcharts().series[1].setData(data.result.used);
 	});
 }
 

@@ -14,7 +14,8 @@ class WS_ClusterDetail {
 	}
 
 	function get_pool($variables){	
-	 	return unserialize(Settings::get("rpc_".$variables['moref'])[0]);
+	 	$rpc = new RPCompute($variables['moref']);
+		return $rpc->RatioRP;
 	}
 
 	function get_clusterlist(){	
