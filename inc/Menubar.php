@@ -27,15 +27,22 @@ class Menubar  implements HTMLObject
             </div>
             <!-- /.navbar-header -->
 
-            <form class="navbar-form navbar-right" role="datalist">
+            <form  id="datesearch" class="navbar-form navbar-right" role="datalist">
                 <div class="form-group">
                     <select id="madate" class="form-control">';
-                        $SQL = "select max(date) as madate from data_hosts";
+                        $SQL = "select distinct date as madate from data_hosts order by date desc";
 			$DateRslt = $this->MySQL->TabResSQL($SQL);
-                        Settings::$timestamp = $DateRslt[0]['madate'];
-                        setcookie("timestamp", $DateRslt[0]['madate']);
+			if (!Settings::$timestamp) {                        
+				Settings::$timestamp = $DateRslt[0]['madate'];
+	                        setcookie("timestamp", $DateRslt[0]['madate']);
+			}
                         foreach ($DateRslt as $key=>$value) {
+			   if (Settings::$timestamp==$value['madate']) {
+                            echo "<option selected>".$value['madate']."</option>";
+			   } else {
                             echo "<option>".$value['madate']."</option>";
+			   }
+
                         }
                 echo '</select>
                 </div>

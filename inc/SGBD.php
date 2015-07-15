@@ -66,6 +66,33 @@ private
 		$this->NbRequetes++;
 		return $TabResultat;
 	}
+	/**
+	* Envoie une requête SQL et récupère le résultât dans un tableau pré formaté au norme DataTable
+	*
+	* $Requete = Requête SQL
+	*/	
+	public function TabProcessSQL($Requete,$Id=null)
+	{
+		$i = 0;
+		$Ressource = $this->mysqli->query($Requete);
+		$TabResultat=array();
+		trace($Requete);
+		if (!$Ressource) throw new exception("Erreur de requête SQL $Requete");
+		
+		while ($Ligne = $Ressource->fetch_assoc())
+		{
+			foreach ($Ligne as $clef => $valeur) {
+				if ($Id==$clef) {
+					$TabResultat[$i]["DT_RowData"] = (array($clef=>$valeur));
+				} else {
+					$TabResultat[$i][$clef] = $valeur;
+				}
+			}
+			$i++;
+		}
+		$Ressource->free_result();
+		return array("draw"=>1,"recordsTotal"=>count($TabResultat),"recordsFiltered"=>count($TabResultat),"data"=>$TabResultat);
+	}	
 	
 	/**
 	* Envoie une requête SQL et récupère le résultât dans un tableau pré format json

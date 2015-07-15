@@ -18,7 +18,9 @@ class Index
 							break;							
 			case "vm":		$page = new VmDetail($_GET['moref']);
 							break;
-			case "datastore":	$page = new DatastoreDetail($_GET['moref']);
+			case "datastore_usage":	$page = new DatastoreDetail($_GET['moref']);
+							break;
+			case "datastore_hist":	$page = new DatastoreHist($_GET['moref']);
 							break;
 			case "vms":		$page = new VmList();
 							break;

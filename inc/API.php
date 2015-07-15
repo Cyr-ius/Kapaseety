@@ -49,6 +49,8 @@ class API
 		$jsonCls[]= new WS_Admin();
 		$jsonCls[]= new WS_ClusterDetail();
 		$jsonCls[]= new WS_DatastoreDetail();
+		$jsonCls[]= new WS_DashboardDetail();
+		$jsonCls[]= new WS_Search();
 		$jsonRpc->registerClass($jsonCls);             
 		$jsonRlt = $jsonRpc->handle() or die('no request');
 	}

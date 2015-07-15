@@ -21,8 +21,6 @@ body {
 	color:black;
 }
 
-
-
 .gauge {
 	margin-top:5px;
 }
@@ -435,3 +433,14 @@ body {
     border-color: #CECECE;
     color: #fff;
 }
+
+/* Dashboard */
+.dashfirstlink td:first-child {
+	color: #428bca;
+}
+.dashfirstlink td:first-child:hover {
+	color: #2a6496;
+	text-decoration:underline;
+	cursor:pointer;
+}
+

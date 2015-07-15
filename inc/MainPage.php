@@ -22,6 +22,7 @@ class MainPage  extends Header
 		$this->header();
 		echo '<body>';
 		echo '<div id="wrapper">';
+		trace(Settings::$timestamp);
 		$this->menubar->toHTML();
 		  echo '<div id="page-wrapper">';
 			echo '<div class="row">';

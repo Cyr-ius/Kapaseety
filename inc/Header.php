@@ -17,12 +17,7 @@ abstract class Header implements HTMLObject
 		echo "<link rel='stylesheet' type='text/css' href='3rdparty/dataTables/css/dataTables.bootstrap.css'>\n";
 		echo "<link rel='stylesheet' type='text/css' href='3rdparty/bootstrap-slider/css/bootstrap-slider.min.css'>\n";
 
-	      echo "<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->\n
-		     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->\n
-		        <!--[if lt IE 9]>\n
-		        <script src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js'></script>\n
-		        <script src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js'></script>\n
-			 <![endif]-->\n";
+
 		echo "<link rel='stylesheet' href='css/kapaseety.css'>\n";
 		echo "<noscript><style>.noscript_hidden { display: none; }</style></noscript>\n";
 		echo "</head>\n";	

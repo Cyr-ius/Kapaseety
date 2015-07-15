@@ -82,6 +82,27 @@ class Style {
 		</div>\n
 		</div>";
 	}	
+	
+	function TableauVide($arrayth,$classtype=null,$title=null,$tableclass="table-paging") {
+		echo "
+		<div class='cold-lg-12'>
+		<div class='panel panel-default panel-stats ".$classtype."' style='margin: 9px 9px 0px '>";
+		if (isset($title)) {echo "<div class='panel-heading'>".$title."</div>";}
+		echo "
+		<table class='table table-striped table-hover ".$tableclass."' cellspacing='0' width='100%'>\n
+		<thead>
+		<tr>";
+		foreach ( $arrayth as $th ) {
+		  echo "<th>".$th."</th>";
+		}
+		echo "
+		</tr>
+		</thead>
+		<tbody></tbody>
+		</table>
+		</div>\n
+		</div>";
+	}	
 
 }
 ?>

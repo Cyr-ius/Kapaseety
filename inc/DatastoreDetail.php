@@ -14,12 +14,9 @@ class DatastoreDetail {
 
 		echo "<div class='row'><div class='col-lg-12'><h3 class='page-header'><i class='fa fa-database fa-fw'></i>Datastores</h3></div></div>";
 		echo "<div class='row'>";
-			$this->style->Graph('graph-datastore_usage','col-lg-12',220);
+			$this->style->Graph('graph-datastore_usage','col-lg-12',640);
 		echo "</div>";
 		echo "<div class='row'>";
-		//~ echo "<div class='row'>";
-		//~ self::Graph('graph-consommation','col-lg-12');
-		//~ echo "</div>";
 		$SQL='SELECT 
 			cluster_moref,
 			cluster_datastore_total as "Total disk" ,
@@ -31,7 +28,6 @@ class DatastoreDetail {
 		$Resulats = $this->MySQL->TabResSQL($SQL);
 		$this->style->Tableau($Resulats,"datastore","Les disques");
 		echo "</div>";
-
 	}
 }
 ?>

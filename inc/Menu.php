@@ -61,7 +61,7 @@ class Menu implements HTMLObject
 						echo "</li>";
 					}	
 					//ESXi out of cluster
-					$SQLHosts='select distinct hostname,moref from hosts where date="'.Settings::$timestamp.'" and moref_cluster IS NULL order by hostname';
+					$SQLHosts='select distinct hostname,moref from hosts where date="'.Settings::$timestamp.'" and moref_cluster like "domain-s%" order by hostname';
 					$HostsList = $this->query($SQLHosts);
 					foreach ($HostsList as $value)  {
 						echo "<li><a class='item' href='#' data-moref='".$value['moref']."' data-href='host'>".$value['hostname']."</a></li>";
@@ -71,9 +71,10 @@ class Menu implements HTMLObject
                             <!-- /.nav-second-level -->
                         </li>
                         <li>
-			    <a  class="item" href="#" data-moref="" data-href="datastore"><i class="fa fa-database fa-fw"></i> Datastores</a>';
-#                          <a href="#"><i class="fa fa-database fa-fw"></i> Datastores<span class="fa arrow"></span></a>
-#                           <ul class="nav nav-second-level collapse">';
+                        <a href="#"><i class="fa fa-database fa-fw"></i> Datastores<span class="fa arrow"></span></a>
+                           <ul class="nav nav-second-level collapse">
+				<li><a class="item" href="#" data-moref="" data-href="datastore_usage">Usage</a></li>
+				<li><a class="item" href="#" data-moref="" data-href="datastore_hist">History</a></li>';
 #					// Cluster
 #					foreach ($ClustersList as $value)  {
 #						echo "<li><a class='item' href='#' data-moref='".$value['cluster_moref']."' data-href='datastore'>".$value['clustername']."</a>";
@@ -84,8 +85,7 @@ class Menu implements HTMLObject
 #					foreach ($HostsList as $value)  {
 #						echo "<li><a class='item' href='#' data-moref='".$value['moref']."' data-href='datastore'>".$value['hostname']."</a></li>";
 #					}						
-#			 echo '</ul>
-			 echo '
+			 echo '</ul>
 			</li>
                     </ul>
                 </div>

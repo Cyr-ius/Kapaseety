@@ -66,5 +66,9 @@ class WS_Stats
 		 return $this->MySQL->ResSQL('select '. $this->MySQL->esc_str($variables['select']).' from ClustersAndHosts where cluster_date="'.Settings::$timestamp.'" and cluster_moref="'.$this->MySQL->esc_str($variables['moref']).'" or moref="'.$this->MySQL->esc_str($variables['moref']).'"');
 		 } catch (Exception $e) { throw new jsonRPCException($e);}
 	}
+
+
+
+
 }
 ?>

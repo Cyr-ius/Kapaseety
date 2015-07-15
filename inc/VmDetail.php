@@ -33,7 +33,7 @@ class VmDetail {
 		echo "<div class='row'>
 				<div class='col-lg-1'><h1><i class='fa fa-laptop fa-fw'></i></h1></div>
 				<div class='col-lg-9'><h3> ".$Rslt[0]['vmname']."<font size='3px'>$power</font></h3><h6 class='page-subtitle'>".$logo." - ".$Rslt[0]['vm_cpu_num']." vCPU / ".$Rslt[0]['vm_mem_total']."Mo RAM</h6></div>
-				<div class='col-lg-2 ref-host'><a href='#' data-moref='".$Rslt[0]['moref']."'><h6><i class='fa fa-building fa-fw'></i>".$Rslt[0]['hostname']."</h6></a></div>					
+				<div class='col-lg-2 ref-host'><a href='#' data-href='host' data-moref='".$Rslt[0]['moref']."'><h6><i class='fa fa-building fa-fw'></i>".$Rslt[0]['hostname']."</h6></a></div>					
 			</div>";
 		echo "<div class='row'>";
 		$this->style->Graph('graph-cpu','col-lg-4',200);
@@ -54,8 +54,8 @@ class VmDetail {
 			vm_mem_usage as "Usage Memory (Mo)",
 			vm_mem_total as "Total Memory (Mo)"
 			FROM guestsandhosts WHERE date > (CURRENT_DATE - INTERVAL 7 DAY) and vm_moref="'.$this->moref.'" order by vm_date desc';
-		$Resulats = $this->MySQL->TabResSQL($SQL);
-		$this->style->Tableau($Resulats,"datelist-stats");
+//~ 		$Resulats = $this->MySQL->TabResSQL($SQL);
+//~ 		$this->style->Tableau($Resulats,"datelist-stats");
 		echo "</div>";
 	}
 }

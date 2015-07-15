@@ -11,6 +11,9 @@ class Settings
 	static public $icon_path="";
 	static public $timestamp;
 	static public $debug=false;
+	static public $rp_maxshare=10000;
+	static public $rp_mincpushare=100;
+	static public $rp_minmemshare=100;
 	
 	function __construct(){
 
@@ -26,12 +29,16 @@ class Settings
 			throw new Exception("You need to create a configuration file.");
 		}
 		/// Check Timestamp for all pages
-		if (isset($_GET['madate'])) { 
-			Settings::$timestamp = $_GET['madate'];
-			setcookie("timestamp",$_GET['madate']);
+		if (isset($_REQUEST['madate'])) { 
+			Settings::$timestamp = $_REQUEST['madate'];
+			setcookie("timestamp",$_REQUEST['madate']);
+#			var_dump($_REQUEST['madate']);
 		} elseif (isset($_COOKIE['timestamp'])) {
+#			var_dump('cookie');
 			Settings::$timestamp = $_COOKIE['timestamp'];
+		} else {
 		}
+
 		/// Set TimeZone
 		date_default_timezone_set($config->timezone);			
 		Settings::$sgbd_server = $config->sgbd_server ;
@@ -44,6 +51,9 @@ class Settings
 		if (count(Settings::get('logo_path'))>0){Settings::$logo_path=Settings::get('logo_path')[0];}
 		if (count(Settings::get('icon_path'))>0){Settings::$icon_path=Settings::get('icon_path')[0];}
 		if (count(Settings::get('debug'))>0){Settings::$debug=Settings::get('debug')[0];}
+		if (count(Settings::get('rp_maxshare'))>0){Settings::$rp_maxshare=Settings::get('rp_maxshare')[0];}
+		if (count(Settings::get('rp_mincpushare'))>0){Settings::$rp_mincpushare=Settings::get('rp_mincpushare')[0];}
+		if (count(Settings::get('rp_minmemshare'))>0){Settings::$rp_minmemshare=Settings::get('rp_minmemshare')[0];}
 	}
 	
 	static public function get($name){
@@ -98,6 +108,18 @@ class Settings
 			if (!Settings::$debug) {echo 'checked';}
 		   echo '/> Non
 		  </div>	
+		  <div class="form-group">
+		    <label for="rp_maxshare">Ressource Pool : Max Shares</label>
+		    <input type="text" class="form-control" id="rp_maxshare" placeholder="Max Shares"  name="rp_maxshare" value="'.Settings::$rp_maxshare.'"/>
+		  </div>		  
+		  <div class="form-group">
+		    <label for="rp_mincpushare">Ressource Pool : Min CPU Shares</label>
+		    <input type="text" class="form-control" id="rp_mincpushare" placeholder="Min CPU Share"  name="rp_mincpushare" value="'.Settings::$rp_mincpushare.'"/>
+		  </div>	
+		  <div class="form-group">
+		    <label for="rp_minmemshare">Ressource Pool : Min Mem. Shares</label>
+		    <input type="text" class="form-control" id="rp_minmemshare" placeholder="Min Mem. Share"  name="rp_minmemshare" value="'.Settings::$rp_minmemshare.'"/>
+		  </div>			  
 		  <button type="submit" class="btn btn-default">Submit</button>
 		</form>
 			</div>';

@@ -4,10 +4,7 @@ class RPCompute
 
 private $MySQL;
 private $Cluster_Stat;
-private $UpperLimit = 10000;
 private $moref;
-private $MinPoolCPUshares = 100;
-private $MinPoolMemshares = 100;
 public  $RatioRP = array("gold"=>4,"silver"=>2,"bronze"=>1);
 private $rps;
 
@@ -22,8 +19,9 @@ private $rps;
 	
 	function compute() {
 
-		$MinPoolCPUshares = $this->MinPoolCPUshares;
-		$MinPoolMemshares = $this->MinPoolMemshares;
+		$MinPoolCPUshares = Settings::$rp_mincpushare;
+		$MinPoolMemshares = Settings::$rp_minmemshare;
+		$UpperLimit = Settings::$rp_maxshare;
 		
 	
 		$arrayindex = 0;
@@ -63,7 +61,7 @@ private $rps;
 
 		If ($MaxCPUShares > 0) {
 			#Set the highest share to a maximum of $SharesUpperLimit. All other shares will be a proprtional value of $SharesUpperLimit
-			$CPUShareMultiplier = $this->UpperLimit  / $MaxCPUShares;
+			$CPUShareMultiplier = $UpperLimit  / $MaxCPUShares;
 			for ($i=0; $i < count($PoolCPUShares); $i++)
 			{
 				$PoolCPUShares[$i] = $PoolCPUShares[$i] * $CPUShareMultiplier;
@@ -81,7 +79,7 @@ private $rps;
 
 		If ($MaxMemShares > 0) {
 			#Set the highest share to a maximum of $SharesUpperLimit. All other shares will be a proprtional value of $SharesUpperLimit
-			$MemShareMultiplier  = $this->UpperLimit  / $MaxMemShares;
+			$MemShareMultiplier  = $UpperLimit  / $MaxMemShares;
 			for ($i=0; $i < count($PoolMemShares); $i++)
 			{
 				$PoolMemShares[$i] = $PoolMemShares[$i] * $MemShareMultiplier;
@@ -111,33 +109,26 @@ private $rps;
 		return $this->rp;
 	}
 	function render(){
-
 		echo "
 		<div class='cold-lg-12'>
-		<div class='panel panel-default panel-stats style='margin: 9px 9px 0px '>
-			<div class='panel-heading'>
-			  <div class='row' style='margin-right:10px'>
-			      <div class='col-sm-11'>Recomandations</div>
-			      <div class='col-sm-1'>
-				<button class='btn btn-default btn-sm' type='button' data-toggle='collapse' data-target='#collapseExample' aria-expanded='false' aria-controls='collapseExample'>
-				<span class='glyphicon glyphicon-cog'></span></button></div>
-			      </div>
-			  <div class='collapse' id='collapseExample'>
-			      <div style='position:relative'>
-			          <input id='slider_rp' type='text'/><br/>
-			      </div>
-			  </div>
+			<div class='panel panel-default panel-stats style='margin: 9px 9px 0px '>
+				<div class='panel-heading'>
+				  <div class='row' style='margin-right:10px'>
+				      <div class='col-sm-11'>Recomandations</div>
+				      <div class='col-sm-1'><button class='btn btn-default btn-sm' type='button' data-toggle='collapse' data-target='#collapseRPSlider' aria-expanded='false' aria-controls='collapseRPSlider'><span class='glyphicon glyphicon-cog'></span></button></div>
+				      </div>
+				  <div class='collapse' id='collapseRPSlider'>
+				      <div style='position:relative'><input id='slider_rp' type='text'/><br/></div>
+				  </div>
+				</div>
+				<table class='table table-striped table-hover table-rp cellspacing='0' width='100%'>\n
+				<thead><tr>
+				<th>Name</th>
+				<th>Cpu Share</th>
+				<th>Mem Share</th>
+				</tr></thead>
+				</table>
 			</div>
-		<table class='table table-striped table-hover table-rp cellspacing='0' width='100%'>\n
-		<thead>\n
-		<tr>\n
-		<th>Name</th>
-		<th>Cpu Share</th>
-		<th>Mem Share</th>
-		</tr>\n
-		</thead>\n
-		</table>
-		</div>
 		</div>
 		";
 

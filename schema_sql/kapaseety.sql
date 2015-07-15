@@ -1,11 +1,29 @@
+-- phpMyAdmin SQL Dump
+-- version 4.2.12
+-- http://www.phpmyadmin.net
 --
--- Base de données :  `kapaseety`
+-- Host: localhost
+-- Generation Time: Jun 08, 2015 at 09:03 AM
+-- Server version: 5.5.27-log
+-- PHP Version: 5.4.6
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+
+--
+-- Database: `kapaseety`
 --
 
 -- --------------------------------------------------------
 
 --
--- Doublure de structure pour la vue `clusterresourcepools`
+-- Stand-in structure for view `clusterresourcepools`
 --
 CREATE TABLE IF NOT EXISTS `clusterresourcepools` (
 `cluster_moref` varchar(50)
@@ -43,11 +61,10 @@ CREATE TABLE IF NOT EXISTS `clusterresourcepools` (
 ,`respool_mem_shares` int(10)
 ,`respool_id` int(11)
 );
-
 -- --------------------------------------------------------
 
 --
--- Doublure de structure pour la vue `clusters`
+-- Stand-in structure for view `clusters`
 --
 CREATE TABLE IF NOT EXISTS `clusters` (
 `cluster_moref` varchar(50)
@@ -73,11 +90,10 @@ CREATE TABLE IF NOT EXISTS `clusters` (
 ,`cluster_datastore_used` int(10)
 ,`cluster_date` datetime
 );
-
 -- --------------------------------------------------------
 
 --
--- Doublure de structure pour la vue `clustersandhosts`
+-- Stand-in structure for view `clustersandhosts`
 --
 CREATE TABLE IF NOT EXISTS `clustersandhosts` (
 `cluster_moref` varchar(50)
@@ -119,17 +135,16 @@ CREATE TABLE IF NOT EXISTS `clustersandhosts` (
 ,`datastore_total` int(10)
 ,`cpu_usage` int(10)
 ,`mem_usage` int(10)
-,`date` date
+,`date` datetime
 ,`host_id` int(11)
 ,`maintenance` varchar(50)
 ,`connectionstate` varchar(50)
 ,`moref_cluster` varchar(50)
 );
-
 -- --------------------------------------------------------
 
 --
--- Doublure de structure pour la vue `clustersandhostsandguests`
+-- Stand-in structure for view `clustersandhostsandguests`
 --
 CREATE TABLE IF NOT EXISTS `clustersandhostsandguests` (
 `cluster_moref` varchar(50)
@@ -173,7 +188,7 @@ CREATE TABLE IF NOT EXISTS `clustersandhostsandguests` (
 ,`mem_usage` int(10)
 ,`maintenance` varchar(50)
 ,`connectionstate` varchar(50)
-,`date` date
+,`date` datetime
 ,`host_id` int(11)
 ,`moref_cluster` varchar(50)
 ,`vm_moref` varchar(50)
@@ -186,19 +201,18 @@ CREATE TABLE IF NOT EXISTS `clustersandhostsandguests` (
 ,`vm_mem_usage` int(10)
 ,`vm_powerstate` varchar(50)
 ,`vm_guest_os` varchar(100)
-,`vm_date` date
+,`vm_date` datetime
 ,`vm_id` int(11)
 ,`vm_moref_resourcepool` varchar(50)
 );
-
 -- --------------------------------------------------------
 
 --
--- Structure de la table `data_clusters`
+-- Table structure for table `data_clusters`
 --
 
 CREATE TABLE IF NOT EXISTS `data_clusters` (
-  `cluster_moref` varchar(50) NOT NULL,
+  `cluster_moref` varchar(50) DEFAULT NULL,
   `clustername` varchar(50) DEFAULT NULL,
   `cluster_hosts_total` int(10) DEFAULT NULL,
   `cluster_vms_total` int(10) DEFAULT NULL,
@@ -220,17 +234,17 @@ CREATE TABLE IF NOT EXISTS `data_clusters` (
   `cluster_datastore_free` int(10) DEFAULT NULL,
   `cluster_datastore_used` int(10) DEFAULT NULL,
   `cluster_date` datetime DEFAULT NULL,
-  `cluster_id` int(11) NOT NULL
-);
+`cluster_id` int(11) NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=21816 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `data_hosts`
+-- Table structure for table `data_hosts`
 --
 
 CREATE TABLE IF NOT EXISTS `data_hosts` (
-  `moref` varchar(50) NOT NULL,
+  `moref` varchar(50) DEFAULT NULL,
   `hostname` varchar(50) DEFAULT NULL,
   `cluster` varchar(50) DEFAULT NULL,
   `vm_num` int(10) DEFAULT NULL,
@@ -247,17 +261,17 @@ CREATE TABLE IF NOT EXISTS `data_hosts` (
   `datastore_total` int(10) DEFAULT NULL,
   `cpu_usage` int(10) DEFAULT NULL,
   `mem_usage` int(10) DEFAULT NULL,
-  `date` date DEFAULT NULL,
-  `host_id` int(11) NOT NULL,
+  `date` datetime DEFAULT NULL,
+`host_id` int(11) NOT NULL,
   `maintenance` varchar(50) DEFAULT NULL,
   `connectionstate` varchar(50) DEFAULT NULL,
   `moref_cluster` varchar(50) DEFAULT NULL
-);
+) ENGINE=InnoDB AUTO_INCREMENT=140307 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `data_respools`
+-- Table structure for table `data_respools`
 --
 
 CREATE TABLE IF NOT EXISTS `data_respools` (
@@ -272,19 +286,19 @@ CREATE TABLE IF NOT EXISTS `data_respools` (
   `respool_mem_limit` int(10) DEFAULT NULL,
   `respool_mem_expand` varchar(50) DEFAULT NULL,
   `respool_mem_shares` int(10) DEFAULT NULL,
-  `respool_id` int(11) NOT NULL
-);
+`respool_id` int(11) NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=37800 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `data_vms`
+-- Table structure for table `data_vms`
 --
 
 CREATE TABLE IF NOT EXISTS `data_vms` (
-  `vm_moref` varchar(50) NOT NULL,
+  `vm_moref` varchar(50) DEFAULT NULL,
   `vmname` varchar(50) DEFAULT NULL,
-  `moref_host` varchar(50) NOT NULL,
+  `moref_host` varchar(50) DEFAULT NULL,
   `vm_cpu_total` int(10) DEFAULT NULL,
   `vm_cpu_usage` int(10) DEFAULT NULL,
   `vm_cpu_num` int(10) DEFAULT NULL,
@@ -292,15 +306,15 @@ CREATE TABLE IF NOT EXISTS `data_vms` (
   `vm_mem_usage` int(10) DEFAULT NULL,
   `vm_powerstate` varchar(50) DEFAULT NULL,
   `vm_guest_os` varchar(100) DEFAULT NULL,
-  `vm_date` date DEFAULT NULL,
-  `vm_id` int(11) NOT NULL,
-  `vm_moref_resourcepool` varchar(50) NOT NULL
-);
+  `vm_date` datetime DEFAULT NULL,
+`vm_id` int(11) NOT NULL,
+  `vm_moref_resourcepool` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=2510501 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Doublure de structure pour la vue `guestsandhosts`
+-- Stand-in structure for view `guestsandhosts`
 --
 CREATE TABLE IF NOT EXISTS `guestsandhosts` (
 `moref` varchar(50)
@@ -319,7 +333,7 @@ CREATE TABLE IF NOT EXISTS `guestsandhosts` (
 ,`datastore_total` int(10)
 ,`cpu_usage` int(10)
 ,`mem_usage` int(10)
-,`date` date
+,`date` datetime
 ,`host_id` int(11)
 ,`maintenance` varchar(50)
 ,`connectionstate` varchar(50)
@@ -334,15 +348,14 @@ CREATE TABLE IF NOT EXISTS `guestsandhosts` (
 ,`vm_mem_usage` int(10)
 ,`vm_powerstate` varchar(50)
 ,`vm_guest_os` varchar(100)
-,`vm_date` date
+,`vm_date` datetime
 ,`vm_id` int(11)
 ,`vm_moref_resourcepool` varchar(50)
 );
-
 -- --------------------------------------------------------
 
 --
--- Doublure de structure pour la vue `hosts`
+-- Stand-in structure for view `hosts`
 --
 CREATE TABLE IF NOT EXISTS `hosts` (
 `moref` varchar(50)
@@ -361,29 +374,28 @@ CREATE TABLE IF NOT EXISTS `hosts` (
 ,`datastore_total` int(10)
 ,`cpu_usage` int(10)
 ,`mem_usage` int(10)
-,`date` date
+,`date` datetime
 ,`host_id` int(11)
 ,`maintenance` varchar(50)
 ,`connectionstate` varchar(50)
 ,`moref_cluster` varchar(50)
 );
-
 -- --------------------------------------------------------
 
 --
--- Structure de la table `settings`
+-- Table structure for table `settings`
 --
 
 CREATE TABLE IF NOT EXISTS `settings` (
   `id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
   `value` varchar(256) NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
 --
--- Doublure de structure pour la vue `vmresourcepools`
+-- Stand-in structure for view `vmresourcepools`
 --
 CREATE TABLE IF NOT EXISTS `vmresourcepools` (
 `vm_moref` varchar(50)
@@ -396,7 +408,7 @@ CREATE TABLE IF NOT EXISTS `vmresourcepools` (
 ,`vm_mem_usage` int(10)
 ,`vm_powerstate` varchar(50)
 ,`vm_guest_os` varchar(100)
-,`vm_date` date
+,`vm_date` datetime
 ,`vm_id` int(11)
 ,`vm_moref_resourcepool` varchar(50)
 ,`respool_moref` varchar(50)
@@ -412,11 +424,10 @@ CREATE TABLE IF NOT EXISTS `vmresourcepools` (
 ,`respool_mem_shares` int(10)
 ,`respool_id` int(11)
 );
-
 -- --------------------------------------------------------
 
 --
--- Structure de la vue `clusterresourcepools`
+-- Structure for view `clusterresourcepools`
 --
 DROP TABLE IF EXISTS `clusterresourcepools`;
 
@@ -425,7 +436,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Structure de la vue `clusters`
+-- Structure for view `clusters`
 --
 DROP TABLE IF EXISTS `clusters`;
 
@@ -434,16 +445,16 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Structure de la vue `clustersandhosts`
+-- Structure for view `clustersandhosts`
 --
 DROP TABLE IF EXISTS `clustersandhosts`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `clustersandhosts` AS select `data_clusters`.`cluster_moref` AS `cluster_moref`,`data_clusters`.`clustername` AS `clustername`,`data_clusters`.`cluster_hosts_total` AS `cluster_hosts_total`,`data_clusters`.`cluster_vms_total` AS `cluster_vms_total`,`data_clusters`.`cluster_failover_cpu` AS `cluster_failover_cpu`,`data_clusters`.`cluster_cpu_total` AS `cluster_cpu_total`,`data_clusters`.`cluster_cpu_realcapacity` AS `cluster_cpu_realcapacity`,`data_clusters`.`cluster_cpu_usage` AS `cluster_cpu_usage`,`data_clusters`.`cluster_failover_mem` AS `cluster_failover_mem`,`data_clusters`.`cluster_mem_usage` AS `cluster_mem_usage`,`data_clusters`.`cluster_mem_realcapacity` AS `cluster_mem_realcapacity`,`data_clusters`.`cluster_mem_total` AS `cluster_mem_total`,`data_clusters`.`cluster_vmcpu_average` AS `cluster_vmcpu_average`,`data_clusters`.`cluster_vmmem_average` AS `cluster_vmmem_average`,`data_clusters`.`cluster_vmcpu_left` AS `cluster_vmcpu_left`,`data_clusters`.`cluster_vmmem_left` AS `cluster_vmmem_left`,`data_clusters`.`cluster_vcpu_ratio` AS `cluster_vcpu_ratio`,`data_clusters`.`cluster_vmhost_ratio` AS `cluster_vmhost_ratio`,`data_clusters`.`cluster_datastore_total` AS `cluster_datastore_total`,`data_clusters`.`cluster_datastore_free` AS `cluster_datastore_free`,`data_clusters`.`cluster_datastore_used` AS `cluster_datastore_used`,`data_clusters`.`cluster_date` AS `cluster_date`,`data_clusters`.`cluster_id` AS `cluster_id`,`data_hosts`.`moref` AS `moref`,`data_hosts`.`hostname` AS `hostname`,`data_hosts`.`vm_num` AS `vm_num`,`data_hosts`.`version` AS `version`,`data_hosts`.`manufacturer` AS `manufacturer`,`data_hosts`.`model` AS `model`,`data_hosts`.`mem_total` AS `mem_total`,`data_hosts`.`cpu_socket_num` AS `cpu_socket_num`,`data_hosts`.`cpu_total` AS `cpu_total`,`data_hosts`.`cpu_numcores` AS `cpu_numcores`,`data_hosts`.`cpu_num` AS `cpu_num`,`data_hosts`.`datastore_free` AS `datastore_free`,`data_hosts`.`datastore_used` AS `datastore_used`,`data_hosts`.`datastore_total` AS `datastore_total`,`data_hosts`.`cpu_usage` AS `cpu_usage`,`data_hosts`.`mem_usage` AS `mem_usage`,`data_hosts`.`date` AS `date`,`data_hosts`.`host_id` AS `host_id`,`data_hosts`.`maintenance` AS `maintenance`,`data_hosts`.`connectionstate` AS `connectionstate`,`data_hosts`.`moref_cluster` AS `moref_cluster` from (`data_clusters` left join `data_hosts` on(((`data_clusters`.`cluster_date` = `data_hosts`.`date`) and (`data_clusters`.`cluster_moref` = `data_hosts`.`moref_cluster`))));
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `clustersandhosts` AS select `data_clusters`.`cluster_moref` AS `cluster_moref`,`data_clusters`.`clustername` AS `clustername`,`data_clusters`.`cluster_hosts_total` AS `cluster_hosts_total`,`data_clusters`.`cluster_vms_total` AS `cluster_vms_total`,`data_clusters`.`cluster_failover_cpu` AS `cluster_failover_cpu`,`data_clusters`.`cluster_cpu_total` AS `cluster_cpu_total`,`data_clusters`.`cluster_cpu_realcapacity` AS `cluster_cpu_realcapacity`,`data_clusters`.`cluster_cpu_usage` AS `cluster_cpu_usage`,`data_clusters`.`cluster_failover_mem` AS `cluster_failover_mem`,`data_clusters`.`cluster_mem_usage` AS `cluster_mem_usage`,`data_clusters`.`cluster_mem_realcapacity` AS `cluster_mem_realcapacity`,`data_clusters`.`cluster_mem_total` AS `cluster_mem_total`,`data_clusters`.`cluster_vmcpu_average` AS `cluster_vmcpu_average`,`data_clusters`.`cluster_vmmem_average` AS `cluster_vmmem_average`,`data_clusters`.`cluster_vmcpu_left` AS `cluster_vmcpu_left`,`data_clusters`.`cluster_vmmem_left` AS `cluster_vmmem_left`,`data_clusters`.`cluster_vcpu_ratio` AS `cluster_vcpu_ratio`,`data_clusters`.`cluster_vmhost_ratio` AS `cluster_vmhost_ratio`,`data_clusters`.`cluster_datastore_total` AS `cluster_datastore_total`,`data_clusters`.`cluster_datastore_free` AS `cluster_datastore_free`,`data_clusters`.`cluster_datastore_used` AS `cluster_datastore_used`,`data_clusters`.`cluster_date` AS `cluster_date`,`data_clusters`.`cluster_id` AS `cluster_id`,`data_hosts`.`moref` AS `moref`,`data_hosts`.`hostname` AS `hostname`,`data_hosts`.`vm_num` AS `vm_num`,`data_hosts`.`version` AS `version`,`data_hosts`.`manufacturer` AS `manufacturer`,`data_hosts`.`model` AS `model`,`data_hosts`.`mem_total` AS `mem_total`,`data_hosts`.`cpu_socket_num` AS `cpu_socket_num`,`data_hosts`.`cpu_total` AS `cpu_total`,`data_hosts`.`cpu_numcores` AS `cpu_numcores`,`data_hosts`.`cpu_num` AS `cpu_num`,`data_hosts`.`datastore_free` AS `datastore_free`,`data_hosts`.`datastore_used` AS `datastore_used`,`data_hosts`.`datastore_total` AS `datastore_total`,`data_hosts`.`cpu_usage` AS `cpu_usage`,`data_hosts`.`mem_usage` AS `mem_usage`,`data_hosts`.`date` AS `date`,`data_hosts`.`host_id` AS `host_id`,`data_hosts`.`maintenance` AS `maintenance`,`data_hosts`.`connectionstate` AS `connectionstate`,`data_hosts`.`moref_cluster` AS `moref_cluster` from (`data_hosts` left join `data_clusters` on(((`data_clusters`.`cluster_date` = `data_hosts`.`date`) and (`data_clusters`.`cluster_moref` = `data_hosts`.`moref_cluster`))));
 
 -- --------------------------------------------------------
 
 --
--- Structure de la vue `clustersandhostsandguests`
+-- Structure for view `clustersandhostsandguests`
 --
 DROP TABLE IF EXISTS `clustersandhostsandguests`;
 
@@ -452,7 +463,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Structure de la vue `guestsandhosts`
+-- Structure for view `guestsandhosts`
 --
 DROP TABLE IF EXISTS `guestsandhosts`;
 
@@ -461,7 +472,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Structure de la vue `hosts`
+-- Structure for view `hosts`
 --
 DROP TABLE IF EXISTS `hosts`;
 
@@ -470,72 +481,64 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Structure de la vue `vmresourcepools`
+-- Structure for view `vmresourcepools`
 --
 DROP TABLE IF EXISTS `vmresourcepools`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vmresourcepools` AS select `data_vms`.`vm_moref` AS `vm_moref`,`data_vms`.`vmname` AS `vmname`,`data_vms`.`moref_host` AS `moref_host`,`data_vms`.`vm_cpu_total` AS `vm_cpu_total`,`data_vms`.`vm_cpu_usage` AS `vm_cpu_usage`,`data_vms`.`vm_cpu_num` AS `vm_cpu_num`,`data_vms`.`vm_mem_total` AS `vm_mem_total`,`data_vms`.`vm_mem_usage` AS `vm_mem_usage`,`data_vms`.`vm_powerstate` AS `vm_powerstate`,`data_vms`.`vm_guest_os` AS `vm_guest_os`,`data_vms`.`vm_date` AS `vm_date`,`data_vms`.`vm_id` AS `vm_id`,`data_vms`.`vm_moref_resourcepool` AS `vm_moref_resourcepool`,`data_respools`.`respool_moref` AS `respool_moref`,`data_respools`.`respool_name` AS `respool_name`,`data_respools`.`respool_moref_cluster` AS `respool_moref_cluster`,`data_respools`.`respool_cpu_reservation` AS `respool_cpu_reservation`,`data_respools`.`respool_cpu_limit` AS `respool_cpu_limit`,`data_respools`.`respool_cpu_expand` AS `respool_cpu_expand`,`data_respools`.`respool_cpu_shares` AS `respool_cpu_shares`,`data_respools`.`respool_mem_reservation` AS `respool_mem_reservation`,`data_respools`.`respool_mem_limit` AS `respool_mem_limit`,`data_respools`.`respool_mem_expand` AS `respool_mem_expand`,`data_respools`.`respool_mem_shares` AS `respool_mem_shares`,`data_respools`.`respool_id` AS `respool_id` from (`data_vms` left join `data_respools` on((`data_vms`.`vm_moref_resourcepool` = convert(`data_respools`.`respool_moref` using utf8))));
 
 --
--- Index pour les tables exportées
+-- Indexes for dumped tables
 --
 
 --
--- Index pour la table `data_clusters`
+-- Indexes for table `data_clusters`
 --
 ALTER TABLE `data_clusters`
-  ADD PRIMARY KEY (`cluster_id`), ADD KEY `cluster_moref` (`cluster_moref`), ADD KEY `cluster_date` (`cluster_date`);
+ ADD PRIMARY KEY (`cluster_id`), ADD KEY `cluster_moref` (`cluster_moref`), ADD KEY `cluster_date` (`cluster_date`), ADD KEY `cluster_vmcpu_left` (`cluster_vmcpu_left`), ADD KEY `cluster_vmmem_left` (`cluster_vmmem_left`);
 
 --
--- Index pour la table `data_hosts`
+-- Indexes for table `data_hosts`
 --
 ALTER TABLE `data_hosts`
-  ADD PRIMARY KEY (`host_id`), ADD KEY `host_moref` (`moref`), ADD KEY `moref_cluster` (`moref_cluster`), ADD KEY `date` (`date`);
+ ADD PRIMARY KEY (`host_id`), ADD KEY `host_moref` (`moref`), ADD KEY `date` (`date`);
 
 --
--- Index pour la table `data_respools`
+-- Indexes for table `data_respools`
 --
 ALTER TABLE `data_respools`
-  ADD PRIMARY KEY (`respool_id`), ADD KEY `respool_moref` (`respool_moref`), ADD KEY `respool_moref_cluster` (`respool_moref_cluster`);
+ ADD PRIMARY KEY (`respool_id`);
 
 --
--- Index pour la table `data_vms`
+-- Indexes for table `data_vms`
 --
 ALTER TABLE `data_vms`
-  ADD PRIMARY KEY (`vm_id`), ADD KEY `vm_moref` (`vm_moref`), ADD KEY `vm_moref_resourcepool` (`vm_moref_resourcepool`), ADD KEY `moref_host` (`moref_host`), ADD KEY `vm_date` (`vm_date`);
+ ADD PRIMARY KEY (`vm_id`), ADD KEY `vm_moref` (`vm_moref`), ADD KEY `vm_date` (`vm_date`), ADD KEY `vm_date_2` (`vm_date`), ADD KEY `vm_moref_2` (`vm_moref`);
 
 --
--- Index pour la table `settings`
---
-ALTER TABLE `settings`
-  ADD PRIMARY KEY (`id`);
-
---
--- AUTO_INCREMENT pour les tables exportées
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT pour la table `data_clusters`
+-- AUTO_INCREMENT for table `data_clusters`
 --
 ALTER TABLE `data_clusters`
-  MODIFY `cluster_id` int(11) NOT NULL AUTO_INCREMENT;
+MODIFY `cluster_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=21816;
 --
--- AUTO_INCREMENT pour la table `data_hosts`
+-- AUTO_INCREMENT for table `data_hosts`
 --
 ALTER TABLE `data_hosts`
-  MODIFY `host_id` int(11) NOT NULL AUTO_INCREMENT;
+MODIFY `host_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=140307;
 --
--- AUTO_INCREMENT pour la table `data_respools`
+-- AUTO_INCREMENT for table `data_respools`
 --
 ALTER TABLE `data_respools`
-  MODIFY `respool_id` int(11) NOT NULL AUTO_INCREMENT;
+MODIFY `respool_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=37800;
 --
--- AUTO_INCREMENT pour la table `data_vms`
+-- AUTO_INCREMENT for table `data_vms`
 --
 ALTER TABLE `data_vms`
-  MODIFY `vm_id` int(11) NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `settings`
---
-ALTER TABLE `settings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+MODIFY `vm_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2510501;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
