@@ -70,35 +70,15 @@ class HostDetail {
 			echo "<div class='row'>";
 			$this->style->Graph('graph-consommation','col-lg-12');
 			echo "</div>";	
-			echo "<div class='row'>";
-			$SQL='SELECT 
-				vm_moref,
-				vmname as "Name",
-				vm_guest_os as "OS",
-				vm_cpu_num "vCPU",
-				vm_cpu_usage as "Usage CPU (Mhz)",
-				vm_cpu_total as "Total CPU (Mhz)",
-				vm_mem_usage as "Usage Memory (Mo)",
-				vm_mem_total as "Total Memory (Mo)"
-				FROM data_vms WHERE vm_date="'.Settings::$timestamp.'" and moref_host="'.$this->moref.'" order by vmname';
-			$Resulats = $this->MySQL->TabResSQL($SQL);
-			$this->style->Tableau($Resulats,"vmlist-stats");
+			echo "<div class='row'>";// List VM
+			$th = array("Name","OS","vCPU","Usage CPU (Mhz)","Total CPU (Mhz)","Usage Memory (Mo)","Total Memory (Mo)");
+			$this->style->TableauVide($th,"dashboard","","vmlisttable dashfirstlink");
+			echo "</div>";	
+
+			echo "<div class='row'>";// Host Stats
+			$th = array("Date","Sockets","Usage CPU (Mhz)","Total CPU (Mhz)","Usage Memory (Mo)","Total Memory (Mo)","Free space","Total space");
+			$this->style->TableauVide($th,"dashboard","","hoststattable");
 			echo "</div>";		
-			echo "<div class='row'>";
-			$SQL='SELECT 
-				date,
-				date as "Date",
-				cpu_socket_num as "Sockets",
-				cpu_usage as "Usage CPU (Mhz)",
-				cpu_total as "Total CPU (Mhz)",
-				mem_usage as "Usage Memory (Mo)",
-				mem_total as "Total Memory (Mo)",
-				datastore_free as "Free space",
-				datastore_total as "Total space"
-				FROM data_hosts WHERE date > (CURRENT_DATE - INTERVAL 7 DAY) and moref="'.$this->moref.'" order by date';
-			$Resulats = $this->MySQL->TabResSQL($SQL);
-			$this->style->Tableau($Resulats,"datelist-stats");
-		echo "</div>";	
 		} else {
 			echo "<div>Cet objet n'existait pas en date du ".Settings::$timestamp."</div>";
 		}

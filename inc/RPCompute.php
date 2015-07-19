@@ -27,7 +27,7 @@ private $rps;
 		$arrayindex = 0;
 		foreach ($this->RatioRP as $key=>$ratio) {
 			$SQL='SELECT respool_name as rpname, count(vmname) as vms_num,sum(vm_mem_total) as mem_total, sum(vm_cpu_num) as vcpu_total 
-				FROM vmresourcepools WHERE vm_date="'.Settings::$timestamp.'" and respool_moref_cluster="'.$this->moref.'" and respool_name="'.$key.'" group by respool_name';
+				FROM vmresourcepools WHERE vm_date="'.$this->MySQL->esc_str(Settings::$timestamp).'" and respool_moref_cluster="'.$this->MySQL->esc_str($this->moref).'" and respool_name="'.$this->MySQL->esc_str($key).'" group by respool_name';
 			$Cluster_Stat = $this->MySQL->TabResSQL($SQL);
 			$name =  strtolower($key);
 			$vm_num =0;

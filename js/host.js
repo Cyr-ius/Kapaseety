@@ -63,4 +63,26 @@ function loadchart_host(){
 	getjson("WS_Stats.host_hist",{"moref":moref,"select":"unix_timestamp(date)*1000,round(datastore_used*100/datastore_total)"},function(data){
 		$('#graph-consommation').highcharts().series[2].setData(data.result)
 	});
+
+	// Load DataTable VM List
+	$('.vmlisttable').dataTable({
+		jQueryUI:true,searching:false,scrollCollapse: true,"ordering": true,paging: true,info:false,"order": [[0,"asc"]],stateSave: true,deferRender: true,processing: true,serverSide: true,scrollX:true,pagingType: "simple_numbers",
+		"ajax": function ( request, drawCallback, settings ) {
+			request['moref']=moref;
+			getjson("WS_Stats.get_vmlist",request,function(data){
+				drawCallback(data.result);
+			});
+		}
+	});
+
+	// Load DataTable Host Stats
+	$('.hoststattable').dataTable({
+		jQueryUI:true,searching:false,scrollCollapse: true,"ordering": true,paging: false,info:false,"order": [[0,"asc"]],stateSave: true,deferRender: true,processing: true,serverSide: true,scrollX:true,pagingType: "simple_numbers",
+		"ajax": function ( request, drawCallback, settings ) {
+			request['moref']=moref;
+			getjson("WS_Stats.get_hoststat",request,function(data){
+				drawCallback(data.result);
+			});
+		}
+	});
 }

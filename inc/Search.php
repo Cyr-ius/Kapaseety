@@ -20,8 +20,12 @@ class Search {
 		$th = array("Nom","Hôte");
 		$this->style->TableauVide($th,"dashboard","Les hyperviseurs","searchhost dashfirstlink");
 		echo "</div>";
+#		echo "<div class='row'>";
+#		$th = array("Nom","VM");
+#		$this->style->TableauVide($th,"dashboard","Les machines virtuelles","searchvm dashfirstlink");
+#		echo "</div>";
 		echo "<div class='row'>";
-		$th = array("Nom","VM");
+		$th = array("Name","Host");
 		$this->style->TableauVide($th,"dashboard","Les machines virtuelles","searchvm dashfirstlink");
 		echo "</div>";
 	}

@@ -10,11 +10,9 @@ function loadchart_dashboard() {
 		update_url(url);
 		$('#page-wrapper').load(url,function(){
 			$('.searchvm').dataTable({
-				jQueryUI:true,searching:true,scrollCollapse: true,paging: true,info:false,"order": [],stateSave: false,deferRender: true,scrollX:true,pagingType: "simple_numbers",
-				"columns":[{data:0,searchable:true},{"data":1,"searchable":false}],
+				jQueryUI:true,searching:true,scrollCollapse: true,paging: true,info:false,"order": [],stateSave: false,deferRender: true,processing: true,serverSide: true,scrollX:true,pagingType: "simple_numbers",
 				"ajax": function ( request, drawCallback, settings ) {
-					query= {"draw":1,"columns":[{"data":0,"name":"vmname","searchable":true,"orderable":true,"search":{"value":"","regex":false}}]};
-					getjson("WS_Search.search_vm",query,function(data){
+					getjson("WS_Search.search_vm",request,function(data){
 						drawCallback(data.result);
 						init();
 					});
@@ -31,11 +29,9 @@ function loadchart_dashboard() {
 		update_url(url);
 		$('#page-wrapper').load(url,function(){
 			$('.searchhost').dataTable({
-				jQueryUI:true,searching:true,scrollCollapse: true,paging: true,info:false,"order": [],stateSave: false,deferRender: true,scrollX:true,pagingType: "simple_numbers",
-				"columns":[{data:0,searchable:true},{"data":1,"searchable":false}],
+				jQueryUI:true,searching:true,scrollCollapse: true,paging: true,info:false,"order": [],stateSave: false,deferRender: true,processing: true,serverSide: true,scrollX:true,pagingType: "simple_numbers",
 				"ajax": function ( request, drawCallback, settings ) {
-					query= {"draw":1,"columns":[{"data":0,"name":"hostname","searchable":true,"orderable":true,"search":{"value":"","regex":false}}]};
-					getjson("WS_Search.search_host",query,function(data){
+					getjson("WS_Search.search_host",request,function(data){
 						drawCallback(data.result);
 						init();
 					});
@@ -45,11 +41,11 @@ function loadchart_dashboard() {
 	return false;
 	});
 	// Load Numbers Vms Label
-	getjson("WS_Stats.vms_total",null,function(data){
+	getjson("WS_DashboardDetail.vms_total",null,function(data){
 		$('#datacenter_vms_total .label').html(data.result[0]);
 	});
 	// Load Numbers Hosts Label
-	getjson("WS_Stats.hosts_total",null,function(data){
+	getjson("WS_DashboardDetail.hosts_total",null,function(data){
 		$('#datacenter_hosts_total .label').html(data.result[0]);
 	});	
 	// Load DataTable Cluster

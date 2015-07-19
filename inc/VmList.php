@@ -13,7 +13,7 @@ class VmList {
 	function toHTML() {
 		echo "<div class='row'><div class='col-lg-12'><h3 class='page-header'><i class='fa fa-laptop fa-fw'></i>Virtuals Machines</h3></div></div>";	
 		echo "<div class='row'>";
-		$th = array("Nom","VM");
+		$th = array("Name","Host","OS","vCPU","Usage CPU (Mhz)","Total CPU (Mhz)","Usage Memory (Mo)","Total Memory (Mo)");
 		$this->style->TableauVide($th,"dashboard","Les machines virtuelles","searchvm dashfirstlink");
 		echo "</div>";
 	}

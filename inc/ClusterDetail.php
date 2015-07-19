@@ -123,34 +123,26 @@ class ClusterDetail {
 			$RPStats->render();
 			echo "</div>";
 		echo "</div>";		
+
 		echo "<div class='row'>"; //VM Consummed Historic
 			$this->style->Graph('graph-consommation-hist','col-lg-12');
 		echo "</div>";		
+
 		echo "<div class='row'>"; //VM Historic
 		$this->style->Graph('graph-nombrevm-hist','col-lg-12');
 		echo "</div>";
-		echo "<div class='row'>"; // VM Top Max
-		$SQL='SELECT 
-			vm_moref,
-			vmname as "VM",
-			vm_mem_usage as "Memory Usage" ,
-			vm_cpu_usage as "CPU Usage"
-			FROM clustersandhostsandguests WHERE cluster_date="'.Settings::$timestamp.'" and moref_cluster="'.$this->moref.'" order by vm_mem_usage desc limit 10';
-		$Resultats = $this->MySQL->TabResSQL($SQL);
-		$this->style->Tableau($Resultats,"vmlist-stats","TOP 10 Max Memory Usage",false,"table-simple");
-		echo "</div>";		
-		echo "<div class='row'>"; // Hypervisor Table
-		$SQL='SELECT 
-			moref,
-			hostname as Host,
-			version as Version ,
-			vm_num as "Vm",
-			datastore_free as "Free space (Go)",
-			datastore_used as "Espace pris"
-			FROM data_hosts WHERE date="'.Settings::$timestamp.'" and moref_cluster="'.$this->moref.'" order by hostname';
-		$Resultats = $this->MySQL->TabResSQL($SQL);
-		$this->style->Tableau($Resultats,"hostlist-stats",null,false,"table-simple");
-		echo "</div>";	
+
+		echo "<div class='row'>";// VM Top Max
+		$th = array("VM","Memory Usage","CPU Usage");
+		$this->style->TableauVide($th,"dashboard","","vmtoplisttable dashfirstlink");
+		echo "</div>";
+
+		echo "<div class='row'>";// Hypervisor Table
+		$th = array("Nom","Version","Vm","Free space (Go)","Usage");
+		$this->style->TableauVide($th,"dashboard","","hostlisttable dashfirstlink");
+		echo "</div>";
+
+
 		} else {
 			echo "<div>Cet objet n'existait pas en date du ".Settings::$timestamp."</div>";
 		}

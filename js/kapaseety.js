@@ -20,8 +20,6 @@ var graphOptions = {
 	credits: {enabled: false}
 	};
 
-var rpstable;
-
 function init() {
 	$('.table-paging').dataTable({jQueryUI:true,searching:false,scrollX: true,scrollCollapse: true,"order": []})
 	$('.table-simple').dataTable({jQueryUI:true,searching:false,scrollX: true,scrollCollapse: true,paging: false,info:false,"order": []})
@@ -65,8 +63,8 @@ function links(){
 	return false;		
 	});
 	
-	$('.dashboardtable tbody,.searchcluster tbody,.searchhost tbody,.searchvm tbody').unbind();
-	$('.dashboardtable tbody,.searchcluster tbody,.searchhost tbody,.searchvm tbody').on('click','tr',function(data){
+	$('.dashboardtable tbody,.searchcluster tbody,.searchhost tbody,.searchvm tbody,.hostlisttable tbody,.vmtoplisttable tbody,.vmlisttable tbody').unbind();
+	$('.dashboardtable tbody,.searchcluster tbody,.searchhost tbody,.searchvm tbody,.hostlisttable tbody,.vmtoplisttable tbody,.vmlisttable tbody').on('click','tr',function(data){
 		type = $(this).data('data-href');
 		item = $(this).data('data-moref');
 		url = '/?m='+type+'&moref='+item+'&madate='+encodeURI($('#madate').val());

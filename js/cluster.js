@@ -8,7 +8,7 @@ function loadslider_cluster(json){
 	$('#slider_rp').on('slideStop',function(data){
 	   jsonObj = {"moref":moref,"setting":{"gold":(7 - data.value[1]),"silver":(data.value[1]-data.value[0]),"bronze":data.value[0]}};
 	   getjson("WS_ClusterDetail.set_pool",jsonObj,function(){
-			rpstable.DataTable().ajax.reload();
+			$('.table-rp').dataTable().DataTable().ajax.reload();
 	   });
 	});
 }
@@ -105,7 +105,7 @@ function loadchart_cluster(){
 	});
 	
 	// Initialize Ressource Pool Slider
-	rpstable = $('.table-rp').dataTable({
+	$('.table-rp').dataTable({
 		jQueryUI:true,searching:false,scrollCollapse: true,paging: false,info:false,"order": [],"serverSide": true,stateSave: true,
 		"columns":[{"data":"name"},{"data":"cpushare"},{"data":"memshare"}],
 		"ajax": function ( request, drawCallback, settings ) {
@@ -150,4 +150,26 @@ function loadchart_cluster(){
 	getjson("WS_Stats.cluster_hist",{"moref":moref,"select":"unix_timestamp(cluster_date)*1000,cluster_vms_total"},function(data){
 		$('#graph-nombrevm-hist').highcharts().series[1].setData(data.result)
 	});	
+
+	// Load DataTable Hosts List
+	$('.hostlisttable').dataTable({
+		jQueryUI:true,searching:false,scrollCollapse: true,"ordering": true,paging: false,info:false,"order": [[0,"asc"]],stateSave: true,deferRender: true,processing: true,serverSide: true,scrollX:true,pagingType: "simple_numbers",
+		"ajax": function ( request, drawCallback, settings ) {
+			request['cluster_moref']=moref;
+			getjson("WS_ClusterDetail.get_hostlist",request,function(data){
+				drawCallback(data.result);
+			});
+		}
+	});
+
+	// Load DataTable VM Top List
+	$('.vmtoplisttable').dataTable({
+		jQueryUI:true,searching:false,scrollCollapse: true,"ordering": true,paging: false,info:false,"order": [[0,"asc"]],stateSave: true,deferRender: true,processing: true,serverSide: true,scrollX:true,pagingType: "simple_numbers",
+		"ajax": function ( request, drawCallback, settings ) {
+			request['cluster_moref']=moref;
+			getjson("WS_ClusterDetail.get_vmtoplist",request,function(data){
+				drawCallback(data.result);
+			});
+		}
+	});
 }

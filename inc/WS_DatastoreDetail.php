@@ -16,7 +16,7 @@ class WS_DatastoreDetail {
 			SELECT clustername,
 			round((cluster_datastore_free/cluster_datastore_total)*100) as prct_free,
 			round((cluster_datastore_used/cluster_datastore_total)*100) as prct_used
-			FROM clusters where cluster_date="'.Settings::$timestamp.'"');
+			FROM clusters where cluster_date="'.$this->MySQL->esc_str(Settings::$timestamp).'"');
 		foreach ($rslt as $item){
 			$free[]=$item['prct_free'];
 			$used[]=$item['prct_used'];
@@ -32,7 +32,7 @@ class WS_DatastoreDetail {
 		$rslt =  $this->MySQL->TabResSQL('select distinct clustername FROM data_clusters order by clustername');
 		foreach ($rslt as $cluster) {
 			$data = null;
-			$datas =  $this->MySQL->TabResSQL('select unix_timestamp(cluster_date) as ladate,cluster_datastore_total FROM data_clusters WHERE clustername="'.$cluster['clustername'].'"');
+			$datas =  $this->MySQL->TabResSQL('select unix_timestamp(cluster_date) as ladate,cluster_datastore_total FROM data_clusters WHERE clustername="'.$this->MySQL->esc_str($cluster['clustername']).'"');
 			foreach ($datas as $item){
 				$data[]=array($item['ladate'],$item['cluster_datastore_total']);
 			}
@@ -49,7 +49,7 @@ class WS_DatastoreDetail {
 		$rslt =  $this->MySQL->TabResSQL('select distinct clustername FROM data_clusters order by clustername');
 		foreach ($rslt as $cluster) {
 			$data = null;
-			$datas =  $this->MySQL->TabResSQL('select unix_timestamp(cluster_date) as ladate,cluster_datastore_used FROM data_clusters WHERE clustername="'.$cluster['clustername'].'"');
+			$datas =  $this->MySQL->TabResSQL('select unix_timestamp(cluster_date) as ladate,cluster_datastore_used FROM data_clusters WHERE clustername="'.$this->MySQL->esc_str($cluster['clustername']).'"');
 			foreach ($datas as $item){
 				$data[]=array($item['ladate'],$item['cluster_datastore_used']);
 			}

@@ -35,12 +35,24 @@ class WS_DashboardDetail {
 
 	public function datacenter_view($variables){
 		try {
-		$rslt =  $this->MySQL->TabResSQL('select distinct clustername,hostname,vmname,vm_mem_usage FROM clustersandhostsandguests where cluster_date="'.Settings::$timestamp.'"');
+		$rslt =  $this->MySQL->TabResSQL('select distinct clustername,hostname,vmname,vm_mem_usage FROM clustersandhostsandguests where cluster_date="'.$this->MySQL->esc_str(Settings::$timestamp).'"');
 		foreach ($rslt as $item) {
 			$serie[ $item['clustername'] ] [ $item['hostname'] ] [ $item['vmname'] ]=$item['vm_mem_usage'];
 		}
 		
 		return $serie;
+		 } catch (Exception $e) { throw new jsonRPCException($e);}
+	}
+
+	public function vms_total($variables){
+		try {
+		 return $this->MySQL->ResSQL('select count(vmname) as vms_count from data_vms where vm_date="'.$this->MySQL->esc_str(Settings::$timestamp).'"');
+		 } catch (Exception $e) { throw new jsonRPCException($e);}
+	}
+	
+	public function hosts_total($variables){
+		try {
+		 return $this->MySQL->ResSQL('select count(hostname) as hosts_count from data_hosts where date="'.$this->MySQL->esc_str(Settings::$timestamp).'"');
 		 } catch (Exception $e) { throw new jsonRPCException($e);}
 	}
 }

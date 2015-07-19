@@ -51,6 +51,12 @@ class WS_Search
 		$columns = array(
 			array( 'db' => 'vmname', 'dt' => 0 ),
 			array( 'db' => 'hostname', 'dt' => 1 ),
+			array( 'db' => 'vm_guest_os', 'dt' => 2 ),
+			array( 'db' => 'vm_cpu_num', 'dt' => 3 ),
+			array( 'db' => 'vm_cpu_usage',   'dt' => 4 ),
+			array( 'db' => 'vm_cpu_total', 'dt' => 5 ),
+			array( 'db' => 'vm_mem_usage',  'dt' => 6 ),
+			array( 'db' => 'vm_mem_total', 'dt' => 7 ),
 			array('db' => 'vm_moref','dt' => 'DT_RowData','formatter' => function( $d, $row ){return array('data-moref'=>$d,'data-href'=>'vm');}),
 		);
 		$whereResult=array('db'=>'vmname is not null');
